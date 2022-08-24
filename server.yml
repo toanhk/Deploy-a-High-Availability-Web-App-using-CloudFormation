@@ -155,5 +155,5 @@ Resources:
 
 Outputs:
   LoadBalancerURL:
-    Description: The public url to load balancer
+    Description: The public url to load balancer - http://myser-webap-iv2nokax2ubz-2096668533.us-west-2.elb.amazonaws.com/index.html
     Value: !Join [ "", ["http://" , !GetAtt WebAppLB.DNSName, '/index.html' ]]          

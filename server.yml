@@ -75,22 +75,18 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          # Install docker
-          apt-get update
-          apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-          add-apt-repository \
-          "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-          $(lsb_release -cs) \
-          stable"
-          apt-get update
-          apt-get install -y docker-ce
-          usermod -aG docker ubuntu
-          docker run -p 8080:8080 tomcat:8.0
+          sudo apt-get update -y
+          sudo apt-get install unzip awscli -y
+          sudo apt-get install apache2 -y
+          sudo systemctl start apache2.service
+          cd /var/www/html
+          aws s3 cp s3://my6730266864131/udagram-web-app.zip .
+          unzip -o udagram-web-app.zip
+
       # ToDo: AMI ID of Ubuntu Linux machine. Too get one, try creating a VM from the web console. 
       ImageId: ami-0ddf424f81ddb0720
-      # ToDo: Change the key-pair name, as applicable to you. 
-      KeyName: VocareumKey2
+      IamInstanceProfile: !Ref ProfileWithRolesForApp
+
       SecurityGroups:
       - Ref: WebServerSecGroup
       InstanceType: t3.medium
@@ -156,3 +152,8 @@ Resources:
       VpcId: 
         Fn::ImportValue:
           Fn::Sub: "${EnvironmentName}-VPCID"
+
+Outputs:
+  LoadBalancerURL:
+    Description: The public url to load balancer
+    Value: !Join [ "", ["http://" , !GetAtt WebAppLB.DNSName ]]          
